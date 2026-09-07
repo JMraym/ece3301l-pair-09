@@ -140,5 +140,20 @@ void main(void) {
         //   3. Show the two patterns on LATC and LATD
         //   4. Keep them displayed for 3 seconds, then turn LEDs off
         //   5. Wait for the button to be released (one roll per press)
+
+        if (read_button_pressed()) {
+            debounce_press();
+
+            /* Confirm that the button is still pressed after debounce */
+            if (read_button_pressed()) {
+                /*
+                 * In 16-bit mode, reading TMR0L latches the corresponding
+                 * high byte. Therefore, read the low byte first.
+                 */
+                timerLow = TMR0L;
+                timerHigh = TMR0H;
+
+                seed = ((uint16_t)timerHigh << 8) | timerLow;
+                srand(seed);
     }
 }
