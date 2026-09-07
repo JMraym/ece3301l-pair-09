@@ -103,6 +103,17 @@ static void init_io(void) {
 
 static uint8_t read_button_pressed(void) {
     // TODO: return 1 while the button is pressed (remember: active-low)
+    while {
+        // active low checks for 0 
+        if (PORTBbits.RB4 == 0) {
+            // button pressed, send high
+            LATDbits.LATD0 = 1;
+        }
+        else{
+            //button released, send low
+            LATDbits.LATD0 = 0;
+        }
+    }
     return 0;
 }
 
