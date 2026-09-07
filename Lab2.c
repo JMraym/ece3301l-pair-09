@@ -86,11 +86,19 @@ static void init_timer0_free_running(void) {
 
 static void init_io(void) {
     // TODO: Make PORTC and PORTD outputs (dice LEDs) and clear their latches.
-
+    // use LAT to clear the output latches
+    LATC = 0x00;
+    LATD = 0x00;
+    // use TRIS to set ports C and D to outputs (TRISx = 0)
+    TRISC = 0x00;
+    TRISD = 0x00;
+    
     // TODO: Make RB4 an input (button, active-low).
+    TRISBbits.TRISB4 = 1;
 
     // TODO: PBADEN=ON means PORTB<5:0> wake up as ANALOG pins.
     //       Force RB4 digital (ANSELB) or the button will always read 0.
+    ANSELBbits.ANSB4 = 0;
 }
 
 static uint8_t read_button_pressed(void) {
