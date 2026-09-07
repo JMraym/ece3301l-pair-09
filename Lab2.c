@@ -119,10 +119,13 @@ static uint8_t read_button_pressed(void) {
 
 static void debounce_press(void) {
     // TODO: short delay (~30 ms) to ride out contact bounce
+    __delay_ms(30);
 }
 
 static void wait_for_release(void) {
     // TODO: block until the button is released, then debounce the release
+    while (read_button_pressed())
+        /*wait until RB4 returns high*/
 }
 
 void main(void) {
