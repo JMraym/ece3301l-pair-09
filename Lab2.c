@@ -60,6 +60,28 @@ static void init_timer0_free_running(void) {
     //   - no prescaler
     //   - clear TMR0H/TMR0L, then turn the timer ON
     // Hint: use the T0CONbits fields. This timer is your entropy source.
+
+       /* Stop Timer0 while configuring it */
+    T0CONbits.TMR0ON = 0;
+
+    /* 16-bit mode */
+    T0CONbits.T08BIT = 0;
+
+    /* Internal instruction clock: Fosc/4 */
+    T0CONbits.T0CS = 0;
+
+    /* T0SE has no effect with internal clock */
+    T0CONbits.T0SE = 0;
+
+    /* Prescaler not assigned: 1:1 */
+    T0CONbits.PSA = 1;
+
+    /* Clear the 16-bit timer */
+    TMR0H = 0;
+    TMR0L = 0;
+
+    /* Start free-running Timer0 */
+    T0CONbits.TMR0ON = 1;
 }
 
 static void init_io(void) {
