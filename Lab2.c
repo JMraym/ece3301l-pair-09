@@ -141,6 +141,9 @@ void main(void) {
         //   4. Keep them displayed for 3 seconds, then turn LEDs off
         //   5. Wait for the button to be released (one roll per press)
 
+        uint8_t timerLow;
+        uint8_t timerHigh;
+
         if (read_button_pressed()) {
             debounce_press();
 
