@@ -1,6 +1,7 @@
 /*
  * File:   main.c
- * Author: <your names here>
+ * Author: Julian Barbosa
+ *         John Raymundo
  *
  * Lab 2 - Electronic Dice
  * ECE 3301L - Introduction to Microcontrollers Laboratory
@@ -51,7 +52,7 @@ static void init_clock_to_64MHz(void) {
     OSCCONbits.SCS = 0;
    
     // TODO: Enable the 4x PLL (OSCTUNEbits.PLLEN) -> 64 MHz
-    while (!OSCTUNEbits.PLLEN = 1)
+    while (!OSCTUNEbits.PLLEN == 1);
 }
 
 static void init_timer0_free_running(void) {
@@ -103,7 +104,7 @@ static void init_io(void) {
 
 static uint8_t read_button_pressed(void) {
     // TODO: return 1 while the button is pressed (remember: active-low)
-    while {
+    while(1){
         // active low checks for 0 
         if (PORTBbits.RB4 == 0) {
             // button pressed, send high
@@ -124,11 +125,18 @@ static void debounce_press(void) {
 
 static void wait_for_release(void) {
     // TODO: block until the button is released, then debounce the release
-    while (read_button_pressed())
+    while (read_button_pressed());
         /*wait until RB4 returns high*/
 }
 
 void main(void) {
+    
+    uint8_t timerLow;
+    uint8_t timerHigh;
+    uint16_t seed;
+    uint8_t die1;
+    uint8_t die2;
+    
     init_clock_to_64MHz();
     init_io();
     init_timer0_free_running();
@@ -140,13 +148,7 @@ void main(void) {
         //   3. Show the two patterns on LATC and LATD
         //   4. Keep them displayed for 3 seconds, then turn LEDs off
         //   5. Wait for the button to be released (one roll per press)
-        
-        uint8_t timerLow;
-        uint8_t timerHigh;
-        uint8_t seed;
-        uint8_t die1;
-        uint8_t die2;
-        
+         
         
         if (read_button_pressed()) {
             debounce_press();
@@ -159,18 +161,24 @@ void main(void) {
                  */
                 timerLow = TMR0L;
                 timerHigh = TMR0H;
-
+                
                 seed = ((uint16_t)timerHigh << 8) | timerLow;
                 srand(seed);
-
+                
+                
+                // roll 2 numbers, mod by six for dice value
                 die1 = (uint8_t)(rand() % 6);
                 die2 = (uint8_t)(rand() % 6);
-
+                
+                //set ports C and D to corresponding dice patterns
                 LATC = dicePatterns[die1];
                 LATD = dicePatterns[die2];
-
+                
+                // hold lights for 30secs
                 __delay_ms(3000);
-
+                
+                
+                //turn LEDs off
                 LATC = 0x00;
                 LATD = 0x00;
 
@@ -178,3 +186,4 @@ void main(void) {
             };
         };
     };
+};
