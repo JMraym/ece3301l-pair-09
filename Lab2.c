@@ -133,17 +133,21 @@ void main(void) {
     init_io();
     init_timer0_free_running();
 
-    while (1) {
+     while (1) {
         // TODO: When a (debounced) press is detected:
         //   1. Read TMR0H:TMR0L and use it to seed rand() with srand()
         //   2. Roll two dice with rand() % 6
         //   3. Show the two patterns on LATC and LATD
         //   4. Keep them displayed for 3 seconds, then turn LEDs off
         //   5. Wait for the button to be released (one roll per press)
-
+        
         uint8_t timerLow;
         uint8_t timerHigh;
-
+        uint8_t seed;
+        uint8_t die1;
+        uint8_t die2;
+        
+        
         if (read_button_pressed()) {
             debounce_press();
 
@@ -158,5 +162,19 @@ void main(void) {
 
                 seed = ((uint16_t)timerHigh << 8) | timerLow;
                 srand(seed);
-    }
-}
+
+                die1 = (uint8_t)(rand() % 6);
+                die2 = (uint8_t)(rand() % 6);
+
+                LATC = dicePatterns[die1];
+                LATD = dicePatterns[die2];
+
+                __delay_ms(3000);
+
+                LATC = 0x00;
+                LATD = 0x00;
+
+                wait_for_release();
+            };
+        };
+    };
