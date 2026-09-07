@@ -20,8 +20,16 @@
 
 #define _XTAL_FREQ 64000000UL
 
-/* Dice LED bit patterns - fill these in from the dice table
- * in the lab handout. Index 0 = face "1", index 5 = face "6". */
+/*
+ * Bit positions:
+ *   b0 = upper-left
+ *   b1 = upper-right
+ *   b2 = middle-left
+ *   b3 = center
+ *   b4 = middle-right
+ *   b5 = lower-left
+ *   b6 = lower-right
+ */
 static const uint8_t dicePatterns[6] = {
     0x08, // : pattern for 1
     0x22, // : pattern for 2
