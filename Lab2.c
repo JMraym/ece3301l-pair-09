@@ -23,12 +23,12 @@
 /* Dice LED bit patterns - fill these in from the dice table
  * in the lab handout. Index 0 = face "1", index 5 = face "6". */
 static const uint8_t dicePatterns[6] = {
-    0x00, // TODO: pattern for 1
-    0x00, // TODO: pattern for 2
-    0x00, // TODO: pattern for 3
-    0x00, // TODO: pattern for 4
-    0x00, // TODO: pattern for 5
-    0x00  // TODO: pattern for 6
+    0x08, // : pattern for 1
+    0x22, // : pattern for 2
+    0x2A, // : pattern for 3
+    0x55, // : pattern for 4
+    0x5D, // : pattern for 5
+    0x77  // : pattern for 6
 };
 
 static void init_clock_to_64MHz(void) {
