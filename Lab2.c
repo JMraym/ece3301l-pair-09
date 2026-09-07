@@ -43,6 +43,15 @@ static void init_clock_to_64MHz(void) {
     // TODO: Select the 16 MHz HFINTOSC using OSCCONbits.IRCF
     // TODO: Select the internal oscillator block using OSCCONbits.SCS
     // TODO: Enable the 4x PLL (OSCTUNEbits.PLLEN) -> 64 MHz
+
+     // Select the 16 MHz HFINTOSC using OSCCONbits.IRCF
+    OSCCONbits.IRCF = 7;
+
+    // Select the internal oscillator block using OSCCONbits.SCS
+    OSCCONbits.SCS = 0;
+   
+    // TODO: Enable the 4x PLL (OSCTUNEbits.PLLEN) -> 64 MHz
+    while (!OSCTUNEbits.PLLEN = 1)
 }
 
 static void init_timer0_free_running(void) {
