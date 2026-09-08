@@ -52,7 +52,7 @@ static void init_clock_to_64MHz(void) {
     OSCCONbits.SCS = 0;
    
     // TODO: Enable the 4x PLL (OSCTUNEbits.PLLEN) -> 64 MHz
-    while (!OSCTUNEbits.PLLEN == 1);
+    OSCTUNEbits.PLLEN = 1;
 }
 
 static void init_timer0_free_running(void) {
@@ -62,7 +62,7 @@ static void init_timer0_free_running(void) {
     //   - clear TMR0H/TMR0L, then turn the timer ON
     // Hint: use the T0CONbits fields. This timer is your entropy source.
 
-       /* Stop Timer0 while configuring it */
+    /* Stop Timer0 while configuring it */
     T0CONbits.TMR0ON = 0;
 
     /* 16-bit mode */
@@ -104,17 +104,16 @@ static void init_io(void) {
 
 static uint8_t read_button_pressed(void) {
     // TODO: return 1 while the button is pressed (remember: active-low)
-    while(1){
+    
         // active low checks for 0 
         if (PORTBbits.RB4 == 0) {
             // button pressed, send high
-            LATDbits.LATD0 = 1;
+            return 1;
         }
         else{
             //button released, send low
-            LATDbits.LATD0 = 0;
+            return 0;
         }
-    }
     return 0;
 }
 
@@ -125,8 +124,10 @@ static void debounce_press(void) {
 
 static void wait_for_release(void) {
     // TODO: block until the button is released, then debounce the release
-    while (read_button_pressed());
+    while (read_button_pressed()){
         /*wait until RB4 returns high*/
+    }
+    debounce_press();
 }
 
 void main(void) {
@@ -174,7 +175,7 @@ void main(void) {
                 LATC = dicePatterns[die1];
                 LATD = dicePatterns[die2];
                 
-                // hold lights for 30secs
+                // hold lights for 3 secs
                 __delay_ms(3000);
                 
                 
