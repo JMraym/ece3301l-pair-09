@@ -1,6 +1,6 @@
 /*
  * File:   lab3.c
- * Author: <your names here>
+ * Author: Julian Barbosa , John Raymundo
  *
  * Lab 3 - Traffic Light Controller
  * ECE 3301L - Introduction to Microcontrollers Laboratory
@@ -26,14 +26,21 @@
 static void init(void) {
     // TODO: Configure the oscillator for 64 MHz
     //       (16 MHz HFINTOSC via OSCCONbits.IRCF/SCS + 4x PLL, same as Lab 2)
+    OSCCONbits.IRCF = 7;
 
     // TODO: Make PORTB and PORTD digital (ANSELB / ANSELD).
     //       Critical on the K22: PBADEN=ON makes PORTB analog at reset!
+    ANSELB = 0x00;
+    ANSELD = 0x00;
 
     // TODO: Make RB0-RB5 and RD0-RD5 outputs WITHOUT touching bits 6-7.
     //       Hint: TRISB &= 0xC0 clears only the lower six bits.
+    TRISB &= 0xC0;
+    TRISD &= 0xC0;
 
     // TODO: Start with all traffic LEDs off (again, preserve bits 6-7).
+    LATB &= 0xC0;
+    LATD &= 0xC0;
 }
 
 /**
