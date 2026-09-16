@@ -26,7 +26,8 @@
 static void init(void) {
     // TODO: Configure the oscillator for 64 MHz
     //       (16 MHz HFINTOSC via OSCCONbits.IRCF/SCS + 4x PLL, same as Lab 2)
-    OSCCONbits.IRCF = 7;
+    OSCCONbits.IRCF = 0b111;
+    OSCCONbits.SCS = 0b10;
 
     // TODO: Make PORTB and PORTD digital (ANSELB / ANSELD).
     //       Critical on the K22: PBADEN=ON makes PORTB analog at reset!
@@ -50,6 +51,9 @@ static void init(void) {
 static void set_lights(unsigned char rd_val, unsigned char rb_val) {
     // TODO: Write rd_val to LATD and rb_val to LATB, masking so that
     //       only bits 0-5 change. Hint: (LATD & 0xC0) | (rd_val & 0x3F)
+
+    LATD = (LATD & 0xC0) | (rd_val & 0x3F);
+    LATB = (LATB & 0xC0) | (rb_val & 0x3F);
 }
 
 void main(void) {
@@ -61,8 +65,19 @@ void main(void) {
         //       each state from the pin assignment table above.
         //
         // State A: EW Green,  NS Red  - 6 s
+        set_lights(0x09, 0x24);
+        __delay_ms(6000);
+
         // State B: EW Yellow, NS Red  - 3 s
+        set_lights(0x09, 0x12);
+        __delay_ms(3000);
+
         // State C: NS Green,  EW Red  - 6 s
+        set_lights(0x24, 0x09);
+        __delay_ms(6000);
+
         // State D: NS Yellow, EW Red  - 3 s
+        set_lights(0x12,0x09);
+        __delay_ms(3000);
     }
 }
