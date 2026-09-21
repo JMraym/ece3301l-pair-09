@@ -80,16 +80,29 @@ static uint8_t pedRequest = 0;
 
 static void init(void) {
     // TODO: Oscillator - 16 MHz HFINTOSC (IRCF/SCS)
+    OSCCONbits.IRCF = 0b111;
+    OSCCONbits.SCS = 0b10;
 
     // TODO: Make PORTA/B/C/D/E digital (ANSELx = 0x00)
-
+    ANSELA = 0x00;
+    ANSELB = 0x00;
+    ANSELC = 0x00;
+    ANSELD = 0x00;
+    ANSELE = 0x00;
+    
     // TODO: PORTD RD0-RD5 outputs, PORTB RB0-RB5 outputs (preserve bits 6-7)
+    TRISD &= 0xC0;
+    TRISB &= 0xC0;
 
     // TODO: PORTC - segments as outputs, RC5 as input (button S2)
+    TRISC &= 0x20;
 
     // TODO: RE0 input (pedestrian button), RA4 output (request LED)
-
+    TRISEbits.TRISE0 = 1;
+    TRISAbits.TRISEA4 = 0;
+    
     // TODO: Blank the 7-segment display
+    LATC &= 0xDF;
 }
 
 /** Update traffic lights, touching only bits 0-5 of each port. */
