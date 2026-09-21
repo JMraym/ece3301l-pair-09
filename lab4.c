@@ -115,6 +115,7 @@ static void set_lights(uint8_t rd_val, uint8_t rb_val) {
 /** Show one digit (0-9) on the 7-segment display, preserving RC5. */
 static void seg_show(uint8_t digit) {
     // TODO: LATC = (LATC & 0x20) | (sevenSeg[digit] & ~0x20)
+    LATC = (LATC & 0x20) | (sevenSeg[digit] & ~0x20);
 }
 
 /**
@@ -124,8 +125,17 @@ static void seg_show(uint8_t digit) {
  */
 static uint8_t delay_and_poll(uint16_t ms) {
     // TODO: loop in small __delay_ms(10) steps:
+    __delay_ms(10);
+    
     //   - if RE0 pressed -> latch pedRequest = 1 and light RA4
+    if (PORTEbits.PORTE0 == 0){
+        pedRequest = 1;
+        LATAbits.LATA4 = 1;
+    }
     //   - if RC5 (S2) pressed -> return 1 immediately (enter safety mode)
+    if (PORTCbits.PORTC5 == 0){
+        return 1;
+    }
     return 0;
 }
 
@@ -135,20 +145,48 @@ void main(void) {
     TrafficState state = EW_GREEN;
 
     while (1) {
+        swtich(state){
+            
         // TODO: Implement the FSM with a switch(state):
         //
         //   EW_GREEN:      lights, delay_and_poll(6000), -> EW_YELLOW
+            case EW_GREEN:
+                set_lights(0x09, 0x24);
+                __delay_ms(6000);
+                state = EW_YELLOW;
+                break;
+    
         //   EW_YELLOW:     lights, delay_and_poll(3000),
         //                  -> PED_COUNTDOWN if pedRequest else NS_GREEN
+            case EW_YELLOW:
+                set_lights(0x09, 0x12);
+                __delay_ms(3000);
+        //if (pedRequest == 1) {
+        //}
         //   PED_COUNTDOWN: NS green / EW red; count 9..0 on the 7-seg,
         //                  1 second per digit; clear pedRequest and RA4;
         //                  blank display; -> NS_GREEN
+
+                
         //   NS_GREEN:      lights, delay_and_poll(6000), -> NS_YELLOW
+            case NS_GREEN:
+                set_lights(0x24, 0x09);
+                __delay_ms(6000);
+                state = NS_YELLOW;
+                break;
+                
         //   NS_YELLOW:     lights, delay_and_poll(3000), -> EW_GREEN
+            case NS_YELLOW:
+                set_lights(0x12,0x09);
+                __delay_ms(3000);
+                state = EW_GREEN;
+                break;
         //   ALL_RED_FLASH: flash both red pairs at ~1 Hz until S2 is
         //                  pressed again, then -> EW_GREEN
+        //if ()
         //
         // Any state: if delay_and_poll() reports S2, go to ALL_RED_FLASH.
         (void)state;
+        }
     }
 }
