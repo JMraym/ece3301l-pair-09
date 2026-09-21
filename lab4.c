@@ -108,6 +108,8 @@ static void init(void) {
 /** Update traffic lights, touching only bits 0-5 of each port. */
 static void set_lights(uint8_t rd_val, uint8_t rb_val) {
     // TODO: same masked write as the base lab
+    LATD = (LATD & 0xC0) | (rd_val & 0x3F);
+    LATB = (LATB & 0xC0) | (rb_val & 0x3F);
 }
 
 /** Show one digit (0-9) on the 7-segment display, preserving RC5. */
