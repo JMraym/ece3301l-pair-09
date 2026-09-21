@@ -61,16 +61,16 @@ typedef enum {
  *        ddd
  */
 static const uint8_t sevenSeg[10] = {
-    0xDF, // TODO: 0 (a,b,c,d,e,f ON, g OFF)
-    0xDF, // TODO: 1
-    0xDF, // TODO: 2
-    0xDF, // TODO: 3
-    0xDF, // TODO: 4
-    0xDF, // TODO: 5
-    0xDF, // TODO: 6
-    0xDF, // TODO: 7
-    0xDF, // TODO: 8
-    0xDF  // TODO: 9
+    0x80, // TODO: 0 (a,b,c,d,e,f ON, g OFF)
+    0xD9, // TODO: 1
+    0x44, // TODO: 2
+    0x50, // TODO: 3
+    0x19, // TODO: 4
+    0x12, // TODO: 5
+    0x02, // TODO: 6
+    0x58, // TODO: 7
+    0x00, // TODO: 8
+    0x18  // TODO: 9
 };
 
 #define SEG_BLANK 0xDF          /* All segments OFF (preserves RC5 bit) */
