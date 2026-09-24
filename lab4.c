@@ -49,7 +49,7 @@
         ALL_RED_FLASH
     } TrafficState;
 
-    /* 7-Segment Patterns for PORTC (Common Anode: 0=ON, 1=OFF)
+    /* 7-Segment Patterns for PORTC (Common Cathode: 0=OFF, 1=ON)
      *
      *   Bit:   7  6  5  4  3  2  1  0
      *   Seg:   g  f  -  e  d  c  b  a     (bit 5 = RC5 button, always mask it)
@@ -61,19 +61,19 @@
      *        ddd
      */
     static const uint8_t sevenSeg[10] = {
-        0x80, // TODO: 0 (a,b,c,d,e,f ON, g OFF)
-        0xD9, // TODO: 1
-        0x44, // TODO: 2
-        0x50, // TODO: 3
-        0x19, // TODO: 4
-        0x12, // TODO: 5
-        0x02, // TODO: 6
-        0x58, // TODO: 7
-        0x00, // TODO: 8
-        0x18  // TODO: 9
+        0x5F, // TODO: 0 (a,b,c,d,e,f ON, g OFF)
+        0x06, // TODO: 1
+        0xBB, // TODO: 2
+        0xAF, // TODO: 3
+        0xE6, // TODO: 4
+        0xED, // TODO: 5
+        0xFD, // TODO: 6
+        0x27, // TODO: 7
+        0xFF, // TODO: 8
+        0xE7  // TODO: 9
     };
 
-    #define SEG_BLANK 0xDF          /* All segments OFF (preserves RC5 bit) */
+    #define SEG_BLANK 0x20          /* All segments OFF (preserves RC5 bit) */
 
     /* Pedestrian request flag (latched) */
     static uint8_t pedRequest = 0;
@@ -102,7 +102,7 @@
         TRISAbits.TRISA4 = 0;
 
         // TODO: Blank the 7-segment display
-        LATC |= SEG_BLANK;
+        LATC &= SEG_BLANK;
     }
 
     /** Update traffic lights, touching only bits 0-5 of each port. */
@@ -129,13 +129,13 @@
             __delay_ms(10);
 
         //   - if RE0 pressed -> latch pedRequest = 1 and light RA4
-            if (PORTEbits.RE0 == 0){
+            if (PORTEbits.RE0 == 1){
                 pedRequest = 1;
                 LATAbits.LATA4 = 1;
             }
         //   - if RC5 (S2) pressed -> return 1 immediately (enter safety mode)
             if (PORTCbits.RC5 == 0){
-                __delay_ms(50);
+                __delay_ms(50); 
                  // Wait for S2 to be released
                 while (PORTCbits.RC5 == 0);
                 __delay_ms(50);
@@ -147,7 +147,7 @@
 
     void main(void) {
         init();
-
+        
         TrafficState state = EW_GREEN;
 
         while (1) {
@@ -172,7 +172,7 @@
                     if (delay_and_poll(3000)) {
                         state = ALL_RED_FLASH;
                     } else {
-                        if (pedRequest) {
+                        if (pedRequest == 1) {
                             state = PED_COUNTDOWN;
                         } else {
                             state = NS_GREEN;
@@ -184,6 +184,7 @@
             //                  1 second per digit; clear pedRequest and RA4;
                 case PED_COUNTDOWN:
                     set_lights(0x24, 0x09); // NS Green, EW Red
+                    
                     for (int8_t j = 9; j >= 0; j--) {
                         seg_show((uint8_t)j);
                         if (delay_and_poll(1000)) {
@@ -191,12 +192,15 @@
                             break;
                         }
                     }
-
+                    
+                   
                 //                  blank display; -> NS_GREEN
-                    LATC |= SEG_BLANK;
+                    LATC &= SEG_BLANK;
+                    
+                //clear ped request and A4 after countdown
                     pedRequest = 0;
                     LATAbits.LATA4 = 0;
-
+                        
                     if (state != ALL_RED_FLASH) {
                         state = NS_GREEN;
                     }
@@ -224,17 +228,17 @@
             //   ALL_RED_FLASH: flash both red pairs at ~1 Hz until S2 is
             //                  pressed again, then -> EW_GREEN
                 case ALL_RED_FLASH:
-                    LATC |= SEG_BLANK;
+                    LATC &= SEG_BLANK;
                     while (PORTCbits.RC5 != 0){
                         set_lights(0x09,0x09);
                         __delay_ms(500);
                         set_lights(0x00,0x00);
                         __delay_ms(500);
                     }
-                    __delay_ms(50);         
-                    // Wait for S2 to be released
-                    while (PORTCbits.RC5 == 0);
                     __delay_ms(50);
+                    while (PORTCbits.RC5 == 0); // Wait for button release
+                    __delay_ms(50);
+                    
                     state = EW_GREEN;
                     break;
             // Any state: if delay_and_poll() reports S2, go to ALL_RED_FLASH.
